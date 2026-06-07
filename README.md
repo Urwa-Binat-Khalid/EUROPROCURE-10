@@ -17,7 +17,9 @@ EUROPROCURE-10 is a cleaned, enriched, and machine-learning-ready dataset derive
 | Procurement Domains | 7 |
 | Unique Buyers | 132,848 |
 | Unique Suppliers | 216,227 |
-| Total Awarded Value | €197 trillion |
+| Award Value Coverage | 51.3% of records |
+| Distinct Currencies | 74 |
+| Median Contract Value | 999,030 (original notice currency) |
 | Overall Completeness | 84.7% |
 
 ---
@@ -91,6 +93,33 @@ features = awards[["award_value_log", "number_of_bids", "award_estimate_ratio"]]
 | number_of_bids | 34.8% | Voluntary reporting in some member states |
 | eu_fund_name | 5.5% | Only EU-funded contracts |
 | nuts_region | 29.2% | Optional in pre-2019 TED XML schema |
+
+---
+
+## Award Value Notes and Limitations
+
+> ⚠️ **Important:** Award values are reported in their original notice currencies and may include framework-agreement ceilings or maximum contract values. The raw sum of award values should not be interpreted as total procurement expenditure without additional normalization and filtering.
+
+The `award_value` field is extracted from procurement notices published through TED and reflects the value reported in the original notice. Users should be aware of the following:
+
+- Award values are reported in the **original notice currency** — the dataset contains **74 distinct currencies**
+- Values have **not been converted** to a common currency and should not be aggregated directly across currencies without exchange-rate normalization
+- Some notices represent **framework agreements**, maximum contract ceilings, or multi-year procurement arrangements rather than actual expenditure
+- A small number of records contain extremely large reported values (e.g., 999,999,999,999 or 9,999,999,999,999), which likely correspond to ceiling values, placeholder values, or procurement-system reporting conventions
+- Due to multiple currencies and framework-agreement ceilings, the raw sum of `award_value` **should not** be interpreted as total European public procurement spending
+
+**Dataset Statistics:**
+
+| Metric | Value |
+|---|---|
+| Total procurement notices | 1,500,356 |
+| Notices containing award values | 659,176 |
+| Distinct currencies | 74 |
+| Median award value | 999,030 (reported notice currency) |
+| 90th percentile award value | 29.8 million |
+| Maximum reported award value | 9.999 trillion |
+
+Researchers are encouraged to perform currency normalization, outlier analysis, and framework-agreement filtering when conducting spending or market-size analyses.
 
 ---
 
