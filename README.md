@@ -1,145 +1,196 @@
 # EUROPROCURE-10
 
-**1.5 Million EU Public Procurement Records | 2016–2025 | ML-Ready**
-
----
+A large-scale, cleaned, enriched, and machine-learning-ready dataset of European public procurement notices derived from TED (Tenders Electronic Daily) covering the period 2016–2025.
 
 ## Overview
 
-EUROPROCURE-10 is a cleaned, enriched, and machine-learning-ready dataset derived from EU public procurement notices published on TED (Tenders Electronic Daily). It covers a full decade of European public contracting activity — the largest open procurement dataset available in structured ML-ready format.
+EUROPROCURE-10 is a structured procurement intelligence dataset built from public procurement notices published on TED (Tenders Electronic Daily), the official procurement platform of the European Union.
 
-| Attribute | Value |
-|---|---|
-| Total Records | 1,500,356 |
-| Columns | 54 |
-| Year Coverage | 2016 – 2025 |
-| Countries | 228 |
-| Procurement Domains | 7 |
-| Unique Buyers | 132,848 |
-| Unique Suppliers | 216,227 |
-| Award Value Coverage | 51.3% of records |
-| Distinct Currencies | 74 |
-| Median Contract Value | 999,030 (original notice currency) |
-| Overall Completeness | 84.7% |
+The dataset contains procurement opportunities, contract awards, supplier information, financial attributes, contract metadata, procurement procedures, and AI-enriched features extracted from more than a decade of procurement activity.
 
----
+The final release contains:
 
-## What Makes This Different from Raw TED Data
+* **1,500,356 procurement notices**
+* **51 columns**
+* **2016–2025 coverage**
+* **190 countries and territories**
+* **7 procurement domains**
+* **36 languages**
+* **132,849 unique buyers**
+* **216,228 unique winning suppliers**
 
-Raw TED XML/CSV downloads are messy, inconsistent, and not ready for ML. This dataset adds:
-
-- **Domain classification** — 7 domains assigned per record (healthcare, digital tech, construction, automotive, green energy, defense, aerospace)
-- **AI-generated semantic tags** — LLM-generated topic tags for text classification tasks
-- **Procurement risk level** — Derived Low/Medium/High risk tier per record
-- **award_estimate_ratio** — Award vs estimated value ratio (anomaly detection signal)
-- **value_tier** — Contract size band (Micro/Small/Medium/Large/Mega)
-- **is_single_bidder** — Binary flag for single-bid contracts (competition risk)
-- **award_value_log** — Log-transformed award value (ML-ready, skew-reduced)
-- **Cleaned dates, standardised currencies, extracted keywords**
+The dataset was designed to support procurement analytics, public-sector market intelligence, anomaly detection, fraud-risk research, supplier analysis, and machine learning applications.
 
 ---
 
-## Domain Distribution
+## Procurement Domains
 
-| Domain | Records | Share |
-|---|---|---|
-| Healthcare | 441,573 | 29.4% |
-| Digital Technology | 433,042 | 28.9% |
-| Construction & Infrastructure | 381,478 | 25.4% |
-| Automotive | 133,291 | 8.9% |
-| Green Energy | 55,718 | 3.7% |
-| Defense & Security | 38,747 | 2.6% |
-| Aerospace | 16,507 | 1.1% |
+The dataset classifies procurement activity into seven high-level domains:
 
----
-
-## Files Included
-
-```
-europrocure10_full.parquet     — Full 1.5M records (recommended for ML)
-europrocure10_full.csv         — Full 1.5M records (CSV format)
-europrocure10_awards_only.parquet  — ~620K award-stage records with financial data
-data_dictionary.pdf            — Full column reference (54 columns)
-README.md                      — This file
-LICENSE.txt                    — Attribution and reuse terms
-```
+1. Healthcare
+2. Digital Technology
+3. Construction & Infrastructure
+4. Automotive
+5. Green Energy
+6. Defense & Security
+7. Aerospace
 
 ---
 
-## Quick Start (Python)
+## Dataset Statistics
 
-```python
-import pandas as pd
-
-df = pd.read_parquet("europrocure10_full.parquet")
-print(df.shape)          # (1500356, 54)
-print(df.domain.value_counts())
-
-# Filter to award records only
-awards = df[df.notice_stage == "Contract Award Notice"].copy()
-
-# Anomaly detection features
-features = awards[["award_value_log", "number_of_bids", "award_estimate_ratio"]].dropna()
-```
-
----
-
-## Missing Value Notes
-
-| Column | Completeness | Reason |
-|---|---|---|
-| award_value | 43.9% | Only award-stage notices contain this |
-| winner_company | 41.3% | Same — award stage only |
-| number_of_bids | 34.8% | Voluntary reporting in some member states |
-| eu_fund_name | 5.5% | Only EU-funded contracts |
-| nuts_region | 29.2% | Optional in pre-2019 TED XML schema |
+| Metric                   | Value     |
+| ------------------------ | --------- |
+| Records                  | 1,500,356 |
+| Columns                  | 51        |
+| Coverage Period          | 2016–2025 |
+| Countries & Territories  | 190       |
+| Languages                | 36        |
+| Procurement Domains      | 7         |
+| Unique Buyers            | 132,849   |
+| Unique Winning Suppliers | 216,228   |
+| Award Value Coverage     | 43.9%     |
+| Estimated Value Coverage | 49.8%     |
+| Contact Email Coverage   | 92.9%     |
+| Contact Phone Coverage   | 82.5%     |
 
 ---
 
-## Award Value Notes and Limitations
+## Key Features
 
-> ⚠️ **Important:** Award values are reported in their original notice currencies and may include framework-agreement ceilings or maximum contract values. The raw sum of award values should not be interpreted as total procurement expenditure without additional normalization and filtering.
+### Procurement Metadata
 
-The `award_value` field is extracted from procurement notices published through TED and reflects the value reported in the original notice. Users should be aware of the following:
+* Notice identifiers
+* Publication dates
+* Notice types
+* Procurement stages
+* Procurement procedures
+* Contract types
 
-- Award values are reported in the **original notice currency** — the dataset contains **74 distinct currencies**
-- Values have **not been converted** to a common currency and should not be aggregated directly across currencies without exchange-rate normalization
-- Some notices represent **framework agreements**, maximum contract ceilings, or multi-year procurement arrangements rather than actual expenditure
-- A small number of records contain extremely large reported values (e.g., 999,999,999,999 or 9,999,999,999,999), which likely correspond to ceiling values, placeholder values, or procurement-system reporting conventions
-- Due to multiple currencies and framework-agreement ceilings, the raw sum of `award_value` **should not** be interpreted as total European public procurement spending
+### Classification Data
 
-**Dataset Statistics:**
+* CPV codes
+* Primary CPV code
+* Secondary CPV codes
+* CPV descriptions
+* Procurement domains
 
-| Metric | Value |
-|---|---|
-| Total procurement notices | 1,500,356 |
-| Notices containing award values | 659,176 |
-| Distinct currencies | 74 |
-| Median award value | 999,030 (reported notice currency) |
-| 90th percentile award value | 29.8 million |
-| Maximum reported award value | 9.999 trillion |
+### Buyer and Supplier Information
 
-Researchers are encouraged to perform currency normalization, outlier analysis, and framework-agreement filtering when conducting spending or market-size analyses.
+* Contracting authority names
+* Buyer locations
+* Contact information
+* Awarded suppliers
+
+### Financial Attributes
+
+* Estimated contract values
+* Awarded contract values
+* Currency codes
+* Award-to-estimate ratios
+* Contract value tiers
+
+### AI-Enriched Features
+
+* Extracted keywords
+* AI-generated tags
+* Procurement risk levels
+* NLP-ready text samples
+
+---
+
+## Data Processing
+
+The final release includes:
+
+* Removal of redundant columns
+* Country code standardization
+* Language code standardization
+* Notice type normalization
+* CPV code cleanup
+* Procurement-domain classification
+* Keyword extraction
+* AI-generated semantic tagging
+
+Original TED procurement content is preserved wherever possible while improving analytical consistency.
 
 ---
 
-## Recommended Use Cases
+## Important Financial Data Warning
 
-- **Anomaly detection** — award_estimate_ratio, number_of_bids, is_single_bidder
-- **NLP / text classification** — raw_text_sample, keywords, ai_generated_tags
-- **Market intelligence** — winner_company, buyer_country, domain, value_tier
-- **Time-series forecasting** — publication_date, award_value by domain/country
-- **Supplier discovery** — winner_company + cpv_codes + buyer_country
-- **Risk scoring** — procurement_risk_level, is_single_bidder, award_estimate_ratio
+The dataset contains procurement values reported in their original notice currencies.
+
+EUROPROCURE-10 contains multiple currencies and values have **not** been converted into EUR.
+
+Users should **not aggregate or directly compare award_value or estimated_value across currencies** without applying appropriate exchange-rate normalization.
+
+In addition, some framework agreements may report maximum spending ceilings rather than realized expenditures.
+
+---
+
+## Missing Data
+
+Missing values primarily reflect procurement-stage differences and reporting practices across contracting authorities and member states.
+
+Examples include:
+
+* Award values are only available for many award-stage notices.
+* Supplier names are primarily available after contract award.
+* Bid counts are not consistently reported across all jurisdictions.
+* Eligibility requirements are frequently embedded in attached documents rather than structured XML fields.
+
+These missing values generally reflect source reporting limitations rather than extraction failures.
 
 ---
 
-## Licence & Attribution
+## Typical Use Cases
 
-Raw data sourced from **TED (Tenders Electronic Daily), European Union / Publications Office of the European Union**, used under **CC BY 4.0**.
-
-Enriched and processed by **Urwa Binat Khalid**. Additional derived fields include domain classification, AI-generated tags, procurement risk level, and cleaned/standardised procurement attributes. Changes were made to the original data.
-
-Full licence: https://creativecommons.org/licenses/by/4.0/
+* Procurement market intelligence
+* Supplier analytics
+* Public-sector spending analysis
+* Competition analysis
+* Procurement transparency research
+* Fraud-risk detection
+* Weak supervision research
+* Anomaly detection
+* Procurement NLP
+* Large-scale procurement forecasting
 
 ---
+
+## License
+
+Raw data sourced from TED (Tenders Electronic Daily), European Union.
+
+This dataset incorporates data made available under the Creative Commons Attribution 4.0 International (CC BY 4.0) licence.
+
+License:
+https://creativecommons.org/licenses/by/4.0/
+
+---
+
+## Attribution
+
+Raw data sourced from TED (Tenders Electronic Daily), European Union.
+
+Enriched and processed by Urwa Binat Khalid.
+
+The dataset includes additional processing, normalization, classification, feature engineering, keyword extraction, AI-generated tags, and derived procurement intelligence attributes.
+
+---
+
+## Disclaimer
+
+TED, the Publications Office of the European Union, and the European Union do not endorse this dataset, its derived attributes, analyses, conclusions, machine learning models, visualizations, or associated products.
+
+All enrichments, classifications, derived fields, and analytical outputs were independently produced by the dataset author.
+
+---
+
+## Citation
+
+If you use EUROPROCURE-10 in research, publications, or commercial applications, please cite:
+
+Urwa Binat Khalid. EUROPROCURE-10: A Large-Scale European Public Procurement Dataset (2016–2025).
+
+Raw data sourced from TED (Tenders Electronic Daily), European Union. Enriched and processed by Urwa Binat Khalid.
